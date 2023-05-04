@@ -1,0 +1,52 @@
+{% extends "applicant_base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Application Admit Card List</h3>
+                </div>
+                <div class="card-body">
+
+                    <table id="datatable" class="table table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Institute Name</th>
+                                <th>Subject Name</th>
+                                <th>Level</th>
+                                <th>Admit Card</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admit in applicant_admit_card %}
+                            <tr>
+                                <td>{{admit.applicant.student_name}}</td>
+                                <td>{{admit.institute.institute_name}}</td>
+                                <td>{{admit.subject.subject_name}}</td>
+                                <td>{{admit.get_level_display}}</td>
+                                <td>
+                                    {% if admit.admit_card %}
+                                        <a href="{{admit.admit_card.url}}">Download</a>
+                                    {% else %}
+                                        <a href="javascript:void(0)">Not AvialAble</a>
+                                    {% endif %}
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include 'partials/_pagination.html' %}
+        </div>
+    </div>
+{% endblock content %}

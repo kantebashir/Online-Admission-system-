@@ -1,0 +1,49 @@
+{% extends "applicant_base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="float-left">Choose Institute</h4>
+                </div>
+                <div class="card-body">
+                    <form id="applyForm" action="{% url 'applications:apply' applicant_id %}" method="POST" data-subjects-url="{% url 'applications:ajax_load_subjects' %}" novalidate>
+                        {% csrf_token %}
+                        {{application_form|crispy}}
+
+                        <input type="submit" value="Choose">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+
+{% block script %}
+    <script>
+    $("#id_institute").change(function () {
+
+      var url = $("#applyForm").attr("data-subjects-url");
+      var instituteId = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'institute': instituteId
+        },
+        success: function (data) {
+          $("#id_subject").html(data);
+        }
+      });
+
+    });
+    </script>
+{% endblock script %}

@@ -1,0 +1,66 @@
+{% extends "applicant_base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Application List</h3>
+                </div>
+                <div class="card-body">
+                    <table id="datatable" class="table table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Srl</th>
+                                <th>Owner</th>
+                                <th>Student Name</th>
+                                <th>Institute Name</th>
+                                <th>Level</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Paid</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in all_application %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{application.owner.username|title}}</td>
+                                <td>{{application.applicant.student_name}}</td>
+                                <td>{{application.institute.institute_name}}</td>
+                                <td>{{application.get_level_display}}</td>
+                                <td>{{application.subject.subject_name}}</td>
+                                <td>{{application.get_status_display}}</td>
+                                <td>
+                                    {% if application.paid %}
+                                        Paid
+                                    {% elif application.status == '0' %}
+                                        Pending
+                                    {% elif application.status == '3'  %}
+                                        <a href="{% url 'transaction:pay_application_fee' application.id application.institute.id %}" class="btn btn-success btn-block">Pay Fee</a>
+                                    {% else %}
+                                        Nothing
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'applications:application_delete' application.id %}" class="btn btn-danger btn-block btn-sm">
+                                        <i class="fas fa-trash mr-2"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include 'partials/_pagination.html' %}
+        </div>
+    </div>
+{% endblock content %}

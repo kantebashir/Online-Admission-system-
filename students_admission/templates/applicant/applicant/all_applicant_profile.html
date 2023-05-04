@@ -1,0 +1,139 @@
+{% extends "applicant_base.html" %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="float-left">
+                        Applicant Profile(s)
+                    </h4>
+                    <a href="{% url 'applicant:create_applicant_profile' %}" class="float-right btn btn-sm btn-info">
+                        <i class="fas fa-plus">Add Another Profile</i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-inverse table-hover">
+                        <thead>
+                            <tr>
+                                <th>Srl</th>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for profile in all_applicant_profile %}
+
+
+                            <tr>
+                                <td>
+                                    {{forloop.counter}}
+                                </td>
+                                <td>
+                                    <img src="{{profile.student_pic.url}}" width="120px">
+                                </td>
+                                <td>
+                                    {{profile.student_name}}<br>
+                                    {{profile.father_name}}<br>
+                                    {{profile.mother_name}}<br>
+                                </td>
+                                <td>
+                                    <a type="button" data-toggle="modal" data-target="#applicationStatusModel" class="btn-block btn btn-info btn-sm text-white status" data-status-url="{% url 'applicant:application_status' profile.id %}">
+                                        <i class="fas fa-redo mr-1"></i> Application Status
+                                    </a>
+                                    <a href="{% url 'applications:apply' profile.id %}" class="btn-block btn btn-primary btn-sm">
+                                        <i class="far fa-paper-plane mr-1"></i> Apply Now
+                                    </a>
+                                    <a href="{% url 'applicant:edit_applicant_profile' profile.id %}" class="btn-block btn btn-success btn-sm">
+                                        <i class="fas fa-edit mr-1"></i> Edit Profile
+                                    </a>
+                                    <a href="{% url 'applicant:delete_applicant_profile' profile.id %}" class="btn-block btn btn-danger btn-sm">
+                                        <i class="fas fa-trash mr-1"></i> Delete Profile
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<div class="modal fade" id="applicationStatusModel" tabindex="-1" role="dialog" aria-labelledby="applicationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="applicationModalLabel">Application Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+
+{% block script %}
+    <script>
+        jQuery(document).ready(function($) {
+            $(document.body).on('click', '.status', function(event) {
+                event.preventDefault();
+                let statusHtml = '';
+                url = $(this).attr("data-status-url");
+                $.ajax({
+                    url: url,
+                    success: function (data) {
+                        let status = '';
+                        let admit_card = false;
+                        data.forEach( function(element, index) {
+                            if (element.fields.status == '0'){
+                               status = 'Pending'
+                            }else if(element.fields.status == '1'){
+                                status = 'Accepted'
+                                admit_card = true;
+                            }else{
+                                status = 'Canceled'
+                            }
+                            statusHtml += `
+                                <div class="card">
+                                    <ul class="list-group list-group-flush font-weight-bold text-dark">
+                                        <li class="list-group-item">Application Fee : ${element.fields.paid ? 'Paid' : 'Pending'}</li>
+                                        <li class="list-group-item">Status : ${status}</li>
+                                        <li class="list-group-item">
+                                            Admit Card
+                                            <a href="/media/${element.fields.admit_card}">Download</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            `
+                            console.log(element.fields)
+                        });
+                        $('.modal-body').append(statusHtml);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                       console.log(xhr)
+                    }
+                });
+            });
+
+            $(".modal").on("hidden.bs.modal", function(){
+                $(".modal-body").html("");
+            });
+        });
+    </script>
+{% endblock script %}

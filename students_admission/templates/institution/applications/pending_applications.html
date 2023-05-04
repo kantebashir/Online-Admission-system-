@@ -1,0 +1,56 @@
+{% extends "institution_base.html" %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="float-left">
+                        Pending Application
+                    </h4>
+
+                </div>
+                <div class="card-body">
+
+                    <table id="datatable" class="table table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Application Owner</th>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Institute Name</th>
+                                <th>Subject</th>
+                                <th>Level</th>
+                                <th>Paid</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in pending_applications %}
+                            <tr>
+                                <td>{{application.applicant.student_name}}</td>
+                                <td>{{application.roll_number}}</td>
+                                <td>{{application.owner.username|title}}</td>
+                                <td>{{application.institute.institute_name}}</td>
+                                <td>{{application.subject.subject_name}}</td>
+                                <td>{{application.get_level_display}}</td>
+                                <td>{{application.paid}}</td>
+
+                                <td>{{application.created_at}}</td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% include 'partials/_pagination.html' %}
+        </div>
+    </div>
+{% endblock content %}
